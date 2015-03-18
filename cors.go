@@ -24,7 +24,8 @@ type Options struct {
 	MaxAge           time.Duration
 }
 
-// Middleware sets CORS headers for every request
+// Middleware sets CORS headers for every request.
+// NOTE: by default (if no specific options are specified), it is permissive.
 func Middleware(options Options) gin.HandlerFunc {
 	if options.AllowHeaders == nil {
 		options.AllowHeaders = defaultAllowHeaders
@@ -37,11 +38,15 @@ func Middleware(options Options) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := c.Request
 		res := c.Writer
+
+		// CORS headers are added whenever the browser request includes an "Origin" header
 		origin := req.Header.Get("Origin")
-		requestMethod := req.Header.Get("Access-Control-Request-Method")
-		requestHeaders := req.Header.Get("Access-Control-Request-Headers")
+		if origin == "" {
+			return // or c.Next() ?
+		}
 
 		if len(options.AllowOrigins) > 0 {
+			// NOTE: The string "*" cannot be used for a resource that supports credentials
 			res.Header().Set("Access-Control-Allow-Origin", strings.Join(options.AllowOrigins, " "))
 		} else {
 			res.Header().Set("Access-Control-Allow-Origin", origin)
@@ -55,17 +60,21 @@ func Middleware(options Options) gin.HandlerFunc {
 			res.Header().Set("Access-Control-Expose-Headers", strings.Join(options.ExposeHeaders, ","))
 		}
 
+		// Handle preflight request if applicable.
 		if req.Method == "OPTIONS" {
+			preflightRequestMethod := req.Header.Get("Access-Control-Request-Method")
+			preflightRequestHeaders := req.Header.Get("Access-Control-Request-Headers")
+
 			if len(options.AllowMethods) > 0 {
 				res.Header().Set("Access-Control-Allow-Methods", strings.Join(options.AllowMethods, ","))
-			} else if requestMethod != "" {
-				res.Header().Set("Access-Control-Allow-Methods", requestMethod)
+			} else if preflightRequestMethod != "" {
+				res.Header().Set("Access-Control-Allow-Methods", preflightRequestMethod)
 			}
 
 			if len(options.AllowHeaders) > 0 {
 				res.Header().Set("Access-Control-Allow-Headers", strings.Join(options.AllowHeaders, ","))
-			} else if requestHeaders != "" {
-				res.Header().Set("Access-Control-Allow-Headers", requestHeaders)
+			} else if preflightRequestHeaders != "" {
+				res.Header().Set("Access-Control-Allow-Headers", preflightRequestHeaders)
 			}
 
 			if options.MaxAge > time.Duration(0) {
