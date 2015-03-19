@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
+	defaultAllowHeaders = []string{"Origin", "Accept", "Accept-Encoding", "Content-Type", "Content-Length", "Authorization"}
 	defaultAllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"}
 )
 
