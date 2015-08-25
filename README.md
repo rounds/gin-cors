@@ -1,8 +1,9 @@
-# gin-cors
+CORS middleware for [gin].
 
-[![Build Status](https://travis-ci.org/tommy351/gin-cors.svg?branch=master)](https://travis-ci.org/tommy351/gin-cors)
+# DEPRECATED
 
-CORS middleware for [Gin].
+This package is no longer maintained and will be removed in the future.
+Please use the CORS subpackage in [rounds/go-gin-contrib][contrib] instead.
 
 ## Installation
 
@@ -10,7 +11,7 @@ CORS middleware for [Gin].
 $ go get github.com/tommy351/gin-cors
 ```
 
-## Usage
+## Use
 
 ``` go
 import (
@@ -24,4 +25,5 @@ func main(){
 }
 ```
 
-[Gin]: http://gin-gonic.github.io/gin/
+[gin]: http://gin-gonic.github.io/gin/
+[contrib]: https://github.com/rounds/go-gin-contrib
